@@ -14,28 +14,7 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(() => {
     try {
       const saved = localStorage.getItem('ck_cart');
-      return saved ? JSON.parse(saved) : [
-        {
-          id: "prod-1",
-          name: "Teal Zari Weave Saree",
-          type: "Banarasi Silk",
-          price: 3499,
-          originalPrice: 5200,
-          quantity: 1,
-          selectedColor: "#1a6b6b",
-          image: "/images/saree-teal.jpg"
-        },
-        {
-          id: "prod-4",
-          name: "Rose Anarkali Gota Suit Set",
-          type: "Unstitched Suit Set",
-          price: 1899,
-          originalPrice: 2800,
-          quantity: 1,
-          selectedColor: "#c9828a",
-          image: "/images/suit-rose.jpg"
-        }
-      ];
+      return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
@@ -45,7 +24,7 @@ export function CartProvider({ children }) {
   const [wishlist, setWishlist] = useState(() => {
     try {
       const saved = localStorage.getItem('ck_wishlist');
-      return saved ? JSON.parse(saved) : ['prod-2'];
+      return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
