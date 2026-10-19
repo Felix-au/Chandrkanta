@@ -430,12 +430,30 @@ export const db = {
   },
 
   updateOrderStatus: async (orderId, orderStatus, paymentStatus) => {
+    let updatedOrder = null;
     const idx = inMemoryOrders.findIndex(o => o.orderId === orderId);
     if (idx !== -1) {
       if (orderStatus) inMemoryOrders[idx].orderStatus = orderStatus;
       if (paymentStatus) inMemoryOrders[idx].paymentStatus = paymentStatus;
-      return inMemoryOrders[idx];
+      updatedOrder = inMemoryOrders[idx];
     }
-    return null;
+
+    if (isConnected) {
+      try {
+        const updateFields = {};
+        if (orderStatus) updateFields.orderStatus = orderStatus;
+        if (paymentStatus) updateFields.paymentStatus = paymentStatus;
+        const mongoUpdated = await Order.findOneAndUpdate(
+          { orderId },
+          { $set: updateFields },
+          { new: true }
+        ).lean();
+        if (mongoUpdated) updatedOrder = mongoUpdated;
+      } catch (e) {
+        console.error('Error updating order status in MongoDB:', e.message);
+      }
+    }
+
+    return updatedOrder;
   }
 };
