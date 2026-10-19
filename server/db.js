@@ -126,8 +126,18 @@ async function syncWithDatabase() {
       });
     }
 
-    inMemoryLive = liveDoc.data;
-    inMemoryDraft = draftDoc.data;
+    inMemoryLive = {
+      ...DEFAULT_SITE_DATA,
+      ...liveDoc.data,
+      theme: { ...DEFAULT_SITE_DATA.theme, ...(liveDoc.data?.theme || {}) },
+      layout: { ...DEFAULT_SITE_DATA.layout, ...(liveDoc.data?.layout || {}) }
+    };
+    inMemoryDraft = {
+      ...DEFAULT_SITE_DATA,
+      ...draftDoc.data,
+      theme: { ...DEFAULT_SITE_DATA.theme, ...(draftDoc.data?.theme || {}) },
+      layout: { ...DEFAULT_SITE_DATA.layout, ...(draftDoc.data?.layout || {}) }
+    };
     statusCache.lastPublishedAt = liveDoc.lastPublishedAt?.toISOString() || new Date().toISOString();
     statusCache.lastDraftUpdatedAt = draftDoc.lastDraftUpdatedAt?.toISOString() || new Date().toISOString();
   } catch (err) {
