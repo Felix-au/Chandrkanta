@@ -279,5 +279,65 @@ export const DEFAULT_SITE_DATA = {
       description: "Heavy bridal lehenga in rich velvet with authentic hand-stitched zardozi and kundan work with bridal veil dupatta.",
       details: ["Lehenga: Micro Velvet", "Flair: 4.2 Meters", "Embroidery: Zardozi, Cutdana, Dori", "Dupatta: Soft Tulle Double Dupatta"]
     }
-  ]
+  ],
+  theme: {
+    activePreset: "crimson-gold",
+    colors: {
+      accent: "#7B1C1C",
+      accentDk: "#5a1212",
+      accentLt: "#c23939",
+      gold: "#C8922A",
+      goldLt: "#e8c87a",
+      bg: "#faf8f5",
+      surface: "#ffffff",
+      surface2: "#f5f0ea",
+      text: "#171717",
+      textMuted: "#666666",
+      border: "#e0e0e0"
+    },
+    typography: {
+      fontDisp: "'Playfair Display', Georgia, serif",
+      fontBody: "'Mulish', 'Helvetica Neue', sans-serif"
+    },
+    radii: {
+      sm: "4px",
+      md: "8px",
+      lg: "16px",
+      full: "999px"
+    },
+    shadow: "luxury"
+  },
+  layout: {
+    gridColumns: {
+      desktop: 4,
+      tablet: 2,
+      mobile: 2
+    },
+    heroVariant: "center",
+    headerVariant: "sticky",
+    categoryStyle: "cards",
+    visibleSections: {
+      announcementBar: true,
+      hero: true,
+      trustStrip: true,
+      categories: true,
+      featuredProducts: true,
+      festiveBanner: true,
+      whyUs: true,
+      testimonials: true,
+      newsletter: true,
+      footer: true,
+      floatingMobileBar: true
+    },
+    sectionOrder: [
+      "hero",
+      "trustStrip",
+      "categories",
+      "featuredProducts",
+      "festiveBanner",
+      "whyUs",
+      "testimonials",
+      "newsletter"
+    ]
+  }
 };
