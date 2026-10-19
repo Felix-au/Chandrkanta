@@ -397,6 +397,16 @@ export const db = {
 
   /* Orders */
   getOrders: async () => {
+    if (isConnected) {
+      try {
+        const mongoOrders = await Order.find().sort({ createdAt: -1 }).lean();
+        if (mongoOrders && mongoOrders.length > 0) {
+          return mongoOrders;
+        }
+      } catch (e) {
+        console.error('Error fetching orders from MongoDB:', e.message);
+      }
+    }
     return inMemoryOrders;
   },
 
@@ -407,6 +417,15 @@ export const db = {
       createdAt: new Date().toISOString()
     };
     inMemoryOrders.unshift(newOrder);
+
+    if (isConnected) {
+      try {
+        await Order.create(newOrder);
+      } catch (e) {
+        console.error('Error persisting order to MongoDB:', e.message);
+      }
+    }
+
     return newOrder;
   },
 
