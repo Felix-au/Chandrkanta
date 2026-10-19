@@ -55,15 +55,35 @@ function requireAuth(req, res, next) {
 // 1. PUBLIC STOREFRONT ENDPOINTS
 // ==========================================
 
-// Health Check
-app.get(['/health', '/api/health'], (req, res) => {
-  res.json({
-    status: 'online',
-    brand: 'Chandrakanta Luxury Handlooms',
-    timestamp: new Date().toISOString(),
-    database: db.isReady() ? 'mongodb_connected' : 'in_memory_ready',
-    razorpayConfigured: paymentService.isRazorpayConfigured()
-  });
+// Health Check with Database and CDN status
+app.get(['/health', '/api/health'], async (req, res) => {
+  try {
+    const [dbHealth, cdnHealth] = await Promise.all([
+      db.checkHealth(),
+      mediaService.checkHealth()
+    ]);
+
+    const isSystemHealthy = dbHealth.status === 'healthy' && cdnHealth.status === 'healthy';
+
+    res.status(isSystemHealthy ? 200 : 207).json({
+      status: isSystemHealthy ? 'healthy' : 'degraded',
+      brand: 'Chandrakanta Luxury Handlooms',
+      timestamp: new Date().toISOString(),
+      uptimeSeconds: Math.floor(process.uptime()),
+      database: dbHealth,
+      cdn: cdnHealth,
+      payments: {
+        razorpayConfigured: paymentService.isRazorpayConfigured(),
+        upiConfigured: Boolean(process.env.UPI_VPA)
+      }
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 'unhealthy',
+      error: err.message,
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 // Live Public Website Content

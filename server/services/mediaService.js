@@ -24,6 +24,37 @@ export const mediaService = {
     return ensureCloudinaryConfig();
   },
 
+  checkHealth: async () => {
+    if (mediaService.isCloudinaryConfigured()) {
+      try {
+        const start = Date.now();
+        const res = await cloudinary.api.ping();
+        const latencyMs = Date.now() - start;
+        return {
+          status: res.status === 'ok' ? 'healthy' : 'degraded',
+          provider: 'cloudinary',
+          connected: true,
+          cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+          latencyMs,
+          rateLimitRemaining: res.rate_limit_remaining
+        };
+      } catch (err) {
+        return {
+          status: 'degraded',
+          provider: 'cloudinary',
+          connected: false,
+          error: err.message
+        };
+      }
+    }
+    return {
+      status: 'healthy',
+      provider: 'local-disk',
+      connected: true,
+      directory: 'client/public/uploads'
+    };
+  },
+
   uploadImage: async (fileBuffer, originalName, mimeType, folder = 'chandrakanta') => {
     if (mediaService.isCloudinaryConfigured()) {
       try {

@@ -138,6 +138,36 @@ async function syncWithDatabase() {
 export const db = {
   isReady: () => isConnected,
 
+  checkHealth: async () => {
+    if (isConnected && mongoose.connection.readyState === 1) {
+      try {
+        const start = Date.now();
+        await mongoose.connection.db.command({ ping: 1 });
+        const latencyMs = Date.now() - start;
+        return {
+          status: 'healthy',
+          type: 'mongodb',
+          connected: true,
+          latencyMs,
+          host: mongoose.connection.host || 'remote-cluster'
+        };
+      } catch (err) {
+        return {
+          status: 'degraded',
+          type: 'mongodb',
+          connected: false,
+          error: err.message
+        };
+      }
+    }
+    return {
+      status: 'healthy',
+      type: 'in-memory',
+      connected: true,
+      mode: 'fallback-cache'
+    };
+  },
+
   /* Content & UI */
   getLive: async () => {
     if (isConnected) {
