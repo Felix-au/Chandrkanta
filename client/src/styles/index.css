@@ -526,15 +526,30 @@ button {
 
 .cats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .cats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cats-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 .cat-card {
   position: relative;
   overflow: hidden;
   border-radius: var(--r-md);
-  aspect-ratio: 4/3;
+  aspect-ratio: 16/10;
+  max-height: 280px;
   cursor: pointer;
   box-shadow: var(--shadow);
 }
