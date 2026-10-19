@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, CheckCircle, QrCode, Banknote, CreditCard, ArrowRight, ShieldCheck, Copy } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useStore } from '../context/StoreContext';
+import { apiUrl } from '../config/api';
 
 export default function CheckoutModal() {
   const { isCheckoutOpen, setIsCheckoutOpen, cartItems, total, subtotal, shippingFee, placeOrder } = useCart();
@@ -31,7 +32,7 @@ export default function CheckoutModal() {
 
   const handleFetchUpi = async () => {
     try {
-      const res = await fetch(`/api/payments/upi-info?amount=${total}`);
+      const res = await fetch(apiUrl(`/api/payments/upi-info?amount=${total}`));
       const data = await res.json();
       if (data.success) {
         setUpiData(data.data);
@@ -53,7 +54,7 @@ export default function CheckoutModal() {
     let transactionId = '';
     if (paymentMethod === 'RAZORPAY') {
       try {
-        const orderRes = await fetch('/api/payments/create-order', {
+        const orderRes = await fetch(apiUrl('/api/payments/create-order'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ amount: total, receipt: `rcpt_${Date.now()}` })

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useStore } from './StoreContext';
+import { apiUrl } from '../config/api';
 
 const CartContext = createContext();
 
@@ -156,7 +157,7 @@ export function CartProvider({ children }) {
         transactionId
       };
 
-      const res = await fetch('/api/orders', {
+      const res = await fetch(apiUrl('/api/orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload)

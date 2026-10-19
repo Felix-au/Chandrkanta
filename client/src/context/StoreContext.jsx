@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { DEFAULT_STORE_DATA } from '../data/defaultStoreData';
+import { apiUrl } from '../config/api';
 
 const StoreContext = createContext();
 
@@ -24,7 +25,7 @@ export function StoreProvider({ children }) {
   // Fetch live public content
   const fetchLiveContent = useCallback(async () => {
     try {
-      const res = await fetch('/api/content');
+      const res = await fetch(apiUrl('/api/content'));
       if (res.ok) {
         const json = await res.json();
         if (json.success && json.data) {
@@ -42,7 +43,7 @@ export function StoreProvider({ children }) {
   const fetchDraftContent = useCallback(async () => {
     if (!adminToken) return;
     try {
-      const res = await fetch('/api/admin/draft', { headers: authHeaders() });
+      const res = await fetch(apiUrl('/api/admin/draft'), { headers: authHeaders() });
       if (res.ok) {
         const json = await res.json();
         if (json.success) {
@@ -68,7 +69,7 @@ export function StoreProvider({ children }) {
   // Admin Login
   const loginAdmin = async (password) => {
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password })
@@ -93,7 +94,7 @@ export function StoreProvider({ children }) {
   // Update a specific draft section
   const updateDraftSection = async (section, sectionData) => {
     try {
-      const res = await fetch(`/api/admin/draft/${section}`, {
+      const res = await fetch(apiUrl(`/api/admin/draft/${section}`), {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify(sectionData)
@@ -113,7 +114,7 @@ export function StoreProvider({ children }) {
   // Publish Draft to Live
   const publishDraft = async () => {
     try {
-      const res = await fetch('/api/admin/publish', {
+      const res = await fetch(apiUrl('/api/admin/publish'), {
         method: 'POST',
         headers: authHeaders()
       });
@@ -133,7 +134,7 @@ export function StoreProvider({ children }) {
   // Discard Draft
   const discardDraft = async () => {
     try {
-      const res = await fetch('/api/admin/discard', {
+      const res = await fetch(apiUrl('/api/admin/discard'), {
         method: 'POST',
         headers: authHeaders()
       });
@@ -152,7 +153,7 @@ export function StoreProvider({ children }) {
   // Reset Defaults
   const resetDefaults = async () => {
     try {
-      const res = await fetch('/api/admin/reset-defaults', {
+      const res = await fetch(apiUrl('/api/admin/reset-defaults'), {
         method: 'POST',
         headers: authHeaders()
       });
@@ -172,7 +173,7 @@ export function StoreProvider({ children }) {
   // Product CRUD
   const addProduct = async (productData) => {
     try {
-      const res = await fetch('/api/admin/products', {
+      const res = await fetch(apiUrl('/api/admin/products'), {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify(productData)
@@ -191,7 +192,7 @@ export function StoreProvider({ children }) {
 
   const updateProduct = async (id, productData) => {
     try {
-      const res = await fetch(`/api/admin/products/${id}`, {
+      const res = await fetch(apiUrl(`/api/admin/products/${id}`), {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify(productData)
@@ -210,7 +211,7 @@ export function StoreProvider({ children }) {
 
   const deleteProduct = async (id) => {
     try {
-      const res = await fetch(`/api/admin/products/${id}`, {
+      const res = await fetch(apiUrl(`/api/admin/products/${id}`), {
         method: 'DELETE',
         headers: authHeaders()
       });
@@ -229,7 +230,7 @@ export function StoreProvider({ children }) {
   // Category CRUD
   const addCategory = async (categoryData) => {
     try {
-      const res = await fetch('/api/admin/categories', {
+      const res = await fetch(apiUrl('/api/admin/categories'), {
         method: 'POST',
         headers: authHeaders(),
         body: JSON.stringify(categoryData)
@@ -248,7 +249,7 @@ export function StoreProvider({ children }) {
 
   const updateCategory = async (id, categoryData) => {
     try {
-      const res = await fetch(`/api/admin/categories/${id}`, {
+      const res = await fetch(apiUrl(`/api/admin/categories/${id}`), {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify(categoryData)
@@ -267,7 +268,7 @@ export function StoreProvider({ children }) {
 
   const deleteCategory = async (id) => {
     try {
-      const res = await fetch(`/api/admin/categories/${id}`, {
+      const res = await fetch(apiUrl(`/api/admin/categories/${id}`), {
         method: 'DELETE',
         headers: authHeaders()
       });
@@ -286,7 +287,7 @@ export function StoreProvider({ children }) {
   // Orders
   const fetchOrders = async () => {
     try {
-      const res = await fetch('/api/admin/orders', { headers: authHeaders() });
+      const res = await fetch(apiUrl('/api/admin/orders'), { headers: authHeaders() });
       const data = await res.json();
       if (data.success) return data.data;
       return [];
@@ -298,7 +299,7 @@ export function StoreProvider({ children }) {
 
   const updateOrderStatus = async (orderId, orderStatus, paymentStatus) => {
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+      const res = await fetch(apiUrl(`/api/admin/orders/${orderId}/status`), {
         method: 'PUT',
         headers: authHeaders(),
         body: JSON.stringify({ orderStatus, paymentStatus })
