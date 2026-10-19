@@ -61,14 +61,6 @@ export default function Footer({ onFilterCategory, onOpenAdmin }) {
               <li><a href="#hero">Shipping Info</a></li>
               <li><a href="#hero">Care Instructions</a></li>
               <li><a href="#hero">Contact Us</a></li>
-              <li>
-                <button
-                  onClick={onOpenAdmin}
-                  style={{ color: 'var(--gold-lt)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-                >
-                  <Shield size={12} /> Admin Studio
-                </button>
-              </li>
             </ul>
           </div>
 

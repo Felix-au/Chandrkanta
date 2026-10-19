@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Heart, ShoppingBag, Settings, X } from 'lucide-react';
+import { Search, Heart, ShoppingBag, X } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { useCart } from '../context/CartContext';
 
@@ -79,17 +79,6 @@ export default function Navbar({ onOpenAdmin, onFilterCategory }) {
               {itemCount > 0 && <span className="dot">{itemCount}</span>}
             </button>
           </div>
-
-          {/* Admin Studio trigger */}
-          <button
-            className="nav-btn"
-            aria-label="Admin Studio"
-            onClick={onOpenAdmin}
-            title="Admin Studio (Ctrl+Shift+A)"
-            style={{ color: 'var(--accent)' }}
-          >
-            <Settings size={18} strokeWidth={2} />
-          </button>
         </div>
       </div>
 
