@@ -66,6 +66,13 @@ export function StoreProvider({ children }) {
     }
   }, [adminToken, fetchDraftContent]);
 
+  // Inject theme custom properties into document root
+  useEffect(() => {
+    const root = document.documentElement;
+    if (activeTheme?.colors?.accent) root.style.setProperty("--accent", activeTheme.colors.accent);
+    if (activeTheme?.colors?.bg) root.style.setProperty("--bg", activeTheme.colors.bg);
+  }, [activeTheme]);
+
   // Dynamic theme and layout resolution
   const activeTheme = content?.theme || DEFAULT_STORE_DATA?.theme;
   const activeLayout = content?.layout || DEFAULT_STORE_DATA?.layout;
