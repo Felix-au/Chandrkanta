@@ -65,6 +65,12 @@ export function StoreProvider({ children }) {
       fetchDraftContent();
     }
   }, [adminToken, fetchDraftContent]);
+  const updateLayoutSection = (sectionId, updates) => {
+    console.log("Updating layout section", sectionId, updates);
+  };
+  const reorderLayoutSections = (newOrder) => {
+    console.log("Reordering sections", newOrder);
+  };
   const [activePreviewDevice, setActivePreviewDevice] = useState("desktop");
   const [previewModeActive, setPreviewModeActive] = useState(false);
 
