@@ -66,6 +66,10 @@ export function StoreProvider({ children }) {
     }
   }, [adminToken, fetchDraftContent]);
 
+  // Dynamic theme and layout resolution
+  const activeTheme = content?.theme || DEFAULT_STORE_DATA?.theme;
+  const activeLayout = content?.layout || DEFAULT_STORE_DATA?.layout;
+
   // Admin Login
   const loginAdmin = async (password) => {
     try {
