@@ -65,6 +65,11 @@ export function StoreProvider({ children }) {
       fetchDraftContent();
     }
   }, [adminToken, fetchDraftContent]);
+  const saveCustomizationsDraft = () => {
+    try {
+      localStorage.setItem("ck_customizer_draft", JSON.stringify({ theme: activeTheme, layout: activeLayout }));
+    } catch (e) { console.error(e); }
+  };
   const updateLayoutSection = (sectionId, updates) => {
     console.log("Updating layout section", sectionId, updates);
   };
