@@ -65,6 +65,8 @@ export function StoreProvider({ children }) {
       fetchDraftContent();
     }
   }, [adminToken, fetchDraftContent]);
+  const [activePreviewDevice, setActivePreviewDevice] = useState("desktop");
+  const [previewModeActive, setPreviewModeActive] = useState(false);
 
   // Inject theme custom properties into document root
   useEffect(() => {
