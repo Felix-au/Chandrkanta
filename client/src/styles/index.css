@@ -1446,3 +1446,39 @@ footer {
 .nav-wrap.nav-variant-minimal .nav-strip {
   display: none !important;
 }
+
+.hero.hero-variant-split .hero-cnt {
+  justify-content: flex-start;
+  padding: 0 40px;
+}
+.hero.hero-variant-split .hero-box-split {
+  background: rgba(250, 248, 245, 0.95);
+  color: var(--text);
+  border: 1.5px solid rgba(200, 146, 42, 0.4);
+  border-radius: var(--r-lg);
+  padding: 40px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 50px rgba(0,0,0,.3);
+}
+.hero.hero-variant-split .hero-box-split .h-title {
+  color: var(--text);
+}
+.hero.hero-variant-split .hero-box-split .h-sub {
+  color: var(--text-muted);
+}
+
+.cats.cats-style-pills .cats-grid {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  scrollbar-width: none;
+  padding-bottom: 8px;
+}
+.cats.cats-style-pills .cats-grid::-webkit-scrollbar {
+  display: none;
+}
+.cats.cats-style-pills .cat-card {
+  min-width: 240px;
+  height: 200px;
+  border-radius: var(--r-lg);
+}
