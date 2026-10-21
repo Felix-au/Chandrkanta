@@ -1428,3 +1428,21 @@ footer {
   .prod-grid { grid-template-columns: repeat(var(--prod-cols-mobile, 1), 1fr); }
   .why-grid { grid-template-columns: 1fr; }
 }
+
+/* Header, Hero & Category Layout Studio Variants */
+.nav-wrap.nav-variant-floating {
+  position: sticky;
+  top: 12px;
+  width: calc(100% - 32px);
+  max-width: var(--max-w);
+  margin: 0 auto;
+  border-radius: var(--r-full, 999px);
+  border: 1.5px solid rgba(200, 146, 42, 0.3);
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
+.nav-wrap.nav-variant-minimal .nav-strip {
+  display: none !important;
+}
