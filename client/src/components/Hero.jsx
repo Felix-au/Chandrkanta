@@ -4,6 +4,10 @@ import { useStore } from '../context/StoreContext';
 
 export default function Hero({ onFilterCategory }) {
   const { content } = useStore();
+  const visible = content?.layout?.visibleSections?.hero !== false;
+  const layout = content?.layout || {};
+  const heroVariant = layout.heroVariant || 'center';
+
   const hero = content?.hero || {
     label: "New Festive Collection 2024",
     title: "Tradition Woven in Every Thread",
@@ -16,6 +20,8 @@ export default function Hero({ onFilterCategory }) {
     bannerImage: "/images/hero.jpg",
     altText: "Elegant woman in a rich Chandrakanta silk saree amid golden bokeh lights"
   };
+
+  if (!visible) return null;
 
   const handleCtaClick = (category) => {
     if (onFilterCategory) {
@@ -43,22 +49,25 @@ export default function Hero({ onFilterCategory }) {
     return titleText;
   };
 
+  const heroSectionClass = `hero hero-variant-${heroVariant}`;
+
   return (
-    <section className="hero" id="hero" aria-labelledby="hero-h1">
+    <section className={heroSectionClass} id="hero" aria-labelledby="hero-h1" data-cms-target="hero">
       <img
         src={hero.bannerImage || "/images/hero.jpg"}
         alt={hero.altText || "Chandrakanta Luxury Handloom Collection"}
         loading="eager"
+        data-cms-target="hero.bannerImage"
       />
       <div className="hero-ov" aria-hidden="true"></div>
 
       <div className="hero-cnt">
-        <div className="hero-box">
-          <p className="h-label">{hero.label || "New Festive Collection 2024"}</p>
-          <h1 className="h-title" id="hero-h1">
+        <div className={`hero-box ${heroVariant === 'split' ? 'hero-box-split' : ''}`}>
+          <p className="h-label" data-cms-target="hero.label">{hero.label || "New Festive Collection 2024"}</p>
+          <h1 className="h-title" id="hero-h1" data-cms-target="hero.title">
             {renderTitle()}
           </h1>
-          <p className="h-sub">
+          <p className="h-sub" data-cms-target="hero.subtitle">
             {hero.subtitle || "Discover Chandrakanta's exquisite handcrafted sarees and unstitched suit sets — where heritage meets elegance."}
           </p>
           <div className="h-btns">
@@ -66,16 +75,18 @@ export default function Hero({ onFilterCategory }) {
               onClick={() => handleCtaClick('sarees')}
               className="btn-pri"
               id="cta-sarees"
+              data-cms-target="hero.primaryCtaText"
             >
-              {hero.primaryCtaText || "Shop Sarees"}
+              <span>{hero.primaryCtaText || "Shop Sarees"}</span>
               <ArrowRight size={14} strokeWidth={2.5} />
             </button>
             <button
               onClick={() => handleCtaClick('suits')}
               className="btn-ghost-wh"
               id="cta-suits"
+              data-cms-target="hero.secondaryCtaText"
             >
-              {hero.secondaryCtaText || "Explore Suit Sets"}
+              <span>{hero.secondaryCtaText || "Explore Suit Sets"}</span>
             </button>
           </div>
         </div>
