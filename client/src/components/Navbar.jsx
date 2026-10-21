@@ -10,6 +10,8 @@ export default function Navbar({ onOpenAdmin, onFilterCategory }) {
   const [searchQuery, setSearchQuery] = useState('');
 
   const settings = content?.settings || {};
+  const layout = content?.layout || {};
+  const headerVariant = layout.headerVariant || 'sticky';
   const brandName = settings.brandName || 'Chandrakanta';
   const tagline = settings.tagline || 'Premium Ethnic Wear';
 
@@ -31,8 +33,10 @@ export default function Navbar({ onOpenAdmin, onFilterCategory }) {
     if (section) section.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const navWrapClass = `nav-wrap nav-variant-${headerVariant}`;
+
   return (
-    <div className="nav-wrap" role="navigation" aria-label="Site navigation">
+    <div className={navWrapClass} role="navigation" aria-label="Site navigation" data-cms-target="settings.brandName">
       <div className="nav-top">
         {/* Left primary links */}
         <nav className="nav-links" aria-label="Primary left">
@@ -43,8 +47,8 @@ export default function Navbar({ onOpenAdmin, onFilterCategory }) {
 
         {/* Center Logo */}
         <a href="#" className="nav-logo" aria-label={`${brandName} — Home`}>
-          <span className="nav-logo-name">{brandName}</span>
-          <span className="nav-logo-tag">{tagline}</span>
+          <span className="nav-logo-name" data-cms-target="settings.brandName">{brandName}</span>
+          <span className="nav-logo-tag" data-cms-target="settings.tagline">{tagline}</span>
         </a>
 
         {/* Right action icons */}
@@ -134,20 +138,22 @@ export default function Navbar({ onOpenAdmin, onFilterCategory }) {
         </div>
       )}
 
-      {/* Category Ribbon */}
-      <div className="nav-strip" aria-label="Category navigation">
-        <div className="nav-strip-in">
-          <button onClick={() => handleNavClick('sarees')}>Banarasi</button>
-          <button onClick={() => handleNavClick('sarees')}>Kanjivaram</button>
-          <button onClick={() => handleNavClick('sarees')}>Chiffon</button>
-          <button onClick={() => handleNavClick('suits')}>Anarkali Sets</button>
-          <button onClick={() => handleNavClick('suits')}>Straight Cut</button>
-          <button onClick={() => handleNavClick('bridal')}>Lehenga Sets</button>
-          <button onClick={() => handleNavClick('bridal')}>Bridal</button>
-          <button onClick={() => handleNavClick('new')}>New Arrivals</button>
-          <button onClick={() => handleNavClick('all')}>All Collections</button>
+      {/* Category Ribbon (hidden in minimal variant) */}
+      {headerVariant !== 'minimal' && (
+        <div className="nav-strip" aria-label="Category navigation">
+          <div className="nav-strip-in">
+            <button onClick={() => handleNavClick('sarees')}>Banarasi</button>
+            <button onClick={() => handleNavClick('sarees')}>Kanjivaram</button>
+            <button onClick={() => handleNavClick('sarees')}>Chiffon</button>
+            <button onClick={() => handleNavClick('suits')}>Anarkali Sets</button>
+            <button onClick={() => handleNavClick('suits')}>Straight Cut</button>
+            <button onClick={() => handleNavClick('bridal')}>Lehenga Sets</button>
+            <button onClick={() => handleNavClick('bridal')}>Bridal</button>
+            <button onClick={() => handleNavClick('new')}>New Arrivals</button>
+            <button onClick={() => handleNavClick('all')}>All Collections</button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
