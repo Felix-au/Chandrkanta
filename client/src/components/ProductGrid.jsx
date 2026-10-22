@@ -8,7 +8,10 @@ export default function ProductGrid({ activeCategory, searchQuery, onSelectCateg
   const { addToCart, toggleWishlist, isWishlisted, setSelectedProduct } = useCart();
   const [selectedSwatches, setSelectedSwatches] = useState({});
 
+  const visible = content?.layout?.visibleSections?.featuredProducts !== false;
   const products = content?.products || [];
+
+  if (!visible) return null;
 
   // Filter tabs
   const tabs = [
@@ -57,7 +60,7 @@ export default function ProductGrid({ activeCategory, searchQuery, onSelectCateg
   };
 
   return (
-    <section className="prods" id="sarees" aria-labelledby="prod-h2">
+    <section className="prods" id="sarees" aria-labelledby="prod-h2" data-cms-target="products">
       <div className="prods-in">
         <div className="sec-hdr">
           <p className="sec-label">Bestsellers</p>
@@ -99,14 +102,17 @@ export default function ProductGrid({ activeCategory, searchQuery, onSelectCateg
           </div>
         ) : (
           <div className="prod-grid" role="list">
-            {filteredProducts.map((prod) => {
+            {filteredProducts.map((prod, idx) => {
               const loved = isWishlisted(prod.id);
               const activeSwatch = selectedSwatches[prod.id] || prod.swatches?.[0];
+              const originalIndex = products.findIndex(p => p.id === prod.id);
+              const targetIdx = originalIndex >= 0 ? originalIndex : idx;
 
               return (
                 <article
-                  key={prod.id}
+                  key={prod.id || idx}
                   className="prod-card"
+                  data-cms-target={`products.${targetIdx}`}
                   role="listitem"
                   aria-label={prod.name}
                   onClick={() => setSelectedProduct(prod)}
@@ -116,11 +122,15 @@ export default function ProductGrid({ activeCategory, searchQuery, onSelectCateg
                       src={prod.image || '/images/saree-teal.jpg'}
                       alt={prod.name}
                       loading="lazy"
+                      data-cms-target={`products.${targetIdx}.image`}
                     />
 
                     {/* Badge */}
                     {prod.badge && (
-                      <span className={`badge ${prod.badge.toLowerCase() === 'new' ? 'new' : ''}`}>
+                      <span
+                        className={`badge ${prod.badge.toLowerCase() === 'new' ? 'new' : ''}`}
+                        data-cms-target={`products.${targetIdx}.badge`}
+                      >
                         {prod.badge}
                       </span>
                     )}
@@ -147,10 +157,10 @@ export default function ProductGrid({ activeCategory, searchQuery, onSelectCateg
 
                   <div className="prod-info">
                     <p className="prod-type">{prod.type || 'Ethnic Wear'}</p>
-                    <h3 className="prod-name">{prod.name}</h3>
+                    <h3 className="prod-name" data-cms-target={`products.${targetIdx}.name`}>{prod.name}</h3>
 
                     <div className="pricing">
-                      <span className="p-cur">₹{prod.price?.toLocaleString('en-IN')}</span>
+                      <span className="p-cur" data-cms-target={`products.${targetIdx}.price`}>₹{prod.price?.toLocaleString('en-IN')}</span>
                       {prod.originalPrice && (
                         <span className="p-was">₹{prod.originalPrice?.toLocaleString('en-IN')}</span>
                       )}
@@ -160,12 +170,12 @@ export default function ProductGrid({ activeCategory, searchQuery, onSelectCateg
                     {/* Color Swatches */}
                     {prod.swatches && prod.swatches.length > 0 && (
                       <div className="swatches" aria-label="Color choices">
-                        {prod.swatches.map((color, idx) => (
+                        {prod.swatches.map((color, sIdx) => (
                           <span
-                            key={idx}
+                            key={sIdx}
                             className={`sw ${activeSwatch === color ? 'on' : ''}`}
                             style={{ background: color }}
-                            aria-label={`Color option ${idx + 1}`}
+                            aria-label={`Color option ${sIdx + 1}`}
                             onClick={(e) => handleSwatchSelect(prod.id, color, e)}
                           />
                         ))}
