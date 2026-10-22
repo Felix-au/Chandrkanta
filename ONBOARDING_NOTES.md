@@ -68,22 +68,18 @@ website/
 │   │   ├── images/             # 25 static product and collection image files
 │   │   └── uploads/            # Target folder for local disk fallback image uploads
 │   └── src/
-
-│   │   ├── images/             # 25 static product and collection image files
-│   │   └── uploads/            # Target folder for locally uploaded CMS media
-│   └── src/
-│       ├── main.jsx            # React 19 application entry point
-│       ├── App.jsx             # Shell component, route switcher (/admin), mobile action bar
+│       ├── main.jsx            # React 19 root mounting <StoreProvider> and <CartProvider>
+│       ├── App.jsx             # Shell component, /admin route switcher, mobile action bar
 │       ├── admin/
-│       │   └── AdminDashboard.jsx # 1100+ line Admin CMS portal (UI editor, products, orders)
+│       │   └── AdminDashboard.jsx # 1120+ line Admin CMS portal (copy editor, products, orders)
 │       ├── components/         # Storefront UI components
 │       │   ├── AnnouncementBar.jsx  # Animated marquee announcements
-│       │   ├── CartDrawer.jsx       # Side-drawer shopping cart with free shipping bar
+│       │   ├── CartDrawer.jsx       # Slide-out shopping cart with free shipping bar
 │       │   ├── CategoryGrid.jsx     # Visual collection cards (Sarees, Suit Sets)
 │       │   ├── CheckoutModal.jsx    # Checkout flow with COD, UPI QR, and Razorpay
 │       │   ├── FestiveBanner.jsx    # Promotional editorial banner
-│       │   ├── Footer.jsx           # Store footer with brand info and admin link
-│       │   ├── Hero.jsx             # Full-width hero banner with call to actions
+│       │   ├── Footer.jsx           # Store footer with brand info and admin trigger link
+│       │   ├── Hero.jsx             # Full-width hero banner with dual CTA buttons
 │       │   ├── Navbar.jsx           # Sticky nav with search, cart/wishlist counters
 │       │   ├── Newsletter.jsx       # Email subscriber signup strip
 │       │   ├── ProductDetailModal.jsx # Quick-view product popup with color swatches
@@ -92,6 +88,8 @@ website/
 │       │   ├── TrustStrip.jsx       # Value props (authentic handloom, easy returns)
 │       │   ├── WhyUs.jsx            # Artisan commitment block
 │       │   └── WishlistDrawer.jsx   # Slide-out saved items drawer
+│       ├── config/
+│       │   └── api.js               # API URL resolver (VITE_API_URL vs relative proxy)
 │       ├── context/
 │       │   ├── CartContext.jsx      # Cart, wishlist, pricing, order placement (localStorage)
 │       │   └── StoreContext.jsx     # Live & draft CMS state, admin login, catalog CRUD
@@ -100,7 +98,8 @@ website/
 │       └── styles/
 │           └── index.css            # Master stylesheet with luxury ethnic design tokens
 ├── server/                     # Backend Node.js Express REST API
-│   ├── .env                    # Environment variables (secrets, ports, provider keys)
+│   ├── .env                    # Local environment variables (ports, secrets, keys)
+│   ├── .env.example            # Backend environment template
 │   ├── db.js                   # Dual-mode database layer (in-memory + MongoDB sync)
 │   ├── index.js                # Express app entry, routes, auth guard, media upload
 │   ├── package.json            # Server package definition & scripts
@@ -110,19 +109,19 @@ website/
 │   │   ├── Content.js          # Mongoose schema for CMS live/draft content documents
 │   │   ├── Order.js            # Mongoose schema for customer orders
 │   │   └── Product.js          # Mongoose schema for catalog products
-│   ├── routes/                 # Empty directory (all route handlers live in index.js)
+│   ├── routes/                 # Directory exists (all routes currently live in index.js)
 │   └── services/
 │       ├── mediaService.js     # Image upload abstraction (local disk vs Cloudinary)
-│       └── paymentService.js   # Razorpay API client & verification + UPI QR generator
-└── skillui-extract/            # Design system skill files extracted by skillui
-    └── chandrakanta-design/
-        ├── CLAUDE.md           # Instructions on how to consult SKILL.md
-        ├── DESIGN.md           # Visual design tokens and UI specifications
-        ├── SKILL.md            # Comprehensive design system manual
-        ├── chandrakanta-design.skill
-        ├── fonts/              # Custom font files
-        ├── references/         # Extended layout and component references
-        └── screenshots/        # Scroll journey screenshots
+│       └── paymentService.js   # Razorpay client & signature verification + UPI QR generator
+├── skillui-extract/            # Design system tokens and specifications
+│   └── chandrakanta-design/
+│       ├── CLAUDE.md           # Instructions on how to consult SKILL.md
+│       ├── DESIGN.md           # Visual design tokens and UI specifications
+│       ├── SKILL.md            # Comprehensive design system manual
+│       ├── fonts/              # Custom font files
+│       ├── references/         # Extended layout and component references
+│       └── screenshots/        # Scroll journey screenshots
+└── SAMPLE/                     # Untracked sample app ("Hotel Swastika Inn")
 ```
 
 ---
@@ -130,145 +129,148 @@ website/
 ## 4. Architecture and Core Flows
 
 ### Architecture Overview
-- **Storefront Client**: React SPA leveraging React Context for shared state. State is split into [`StoreContext.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/context/StoreContext.jsx) (CMS content, catalog, admin authentication) and [`CartContext.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/context/CartContext.jsx) (cart items, wishlist, checkout triggers, localStorage persistence).
-- **Backend API**: Express server in [`server/index.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/index.js) backed by [`server/db.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/db.js).
-- **Live vs. Draft CMS Model**:
-  - The site data is represented as a JSON document tree (hero, banners, announcements, products, categories).
-  - Admin changes write to a `draft` copy.
-  - The live storefront only displays the `live` copy.
-  - When the admin clicks "Publish", the draft overwrites the live content.
+- **Storefront Client**: Single-page application using React Context. State is separated into [`StoreContext.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/context/StoreContext.jsx) (CMS copy, catalog products, categories, admin session) and [`CartContext.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/context/CartContext.jsx) (cart items, wishlist, order placement, `localStorage` persistence).
+- **Backend API**: Monolithic Express application in [`server/index.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/index.js) backed by [`server/db.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/db.js).
+- **Live vs. Draft CMS Workflow**:
+  - Store content is represented as a JSON document tree (hero, announcements, categories, products, footer, settings).
+  - Admin changes are saved to the `draft` document.
+  - Public storefront requests only receive the `live` document.
+  - When the admin publishes, `draft` overwrites `live`, updating `lastPublishedAt`.
 
 ### Core Flow 1: Storefront Hydration
-1. Client starts up in [`client/src/main.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/main.jsx), rendering `<StoreProvider>`.
-2. `StoreProvider` calls `GET /api/content` (proxied by Vite to port 5000).
-3. Express in [`server/index.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/index.js) responds via `db.getLive()`.
-4. If the server is offline or unreachable, `StoreProvider` catches the error and falls back to [`client/src/data/defaultStoreData.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/data/defaultStoreData.js).
-5. All storefront components dynamically render content from `useStore().content`.
+1. Client boots via [`client/src/main.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/main.jsx) and mounts `<StoreProvider>`.
+2. `fetchLiveContent()` requests `GET /api/content` via [`client/src/config/api.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/config/api.js).
+3. Express server answers from `db.getLive()`.
+4. If the server is offline, `<StoreProvider>` catches the network error and loads local seed data from [`client/src/data/defaultStoreData.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/data/defaultStoreData.js).
+5. All storefront UI components read dynamic copy and catalog items from `useStore().content`.
 
-### Core Flow 2: Adding to Cart & Checkout
-1. User clicks "Add to Bag" on a product card or within [`ProductDetailModal.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/components/ProductDetailModal.jsx).
-2. `addToCart()` in [`CartContext.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/context/CartContext.jsx) appends the item, recalculates totals and free shipping eligibility, saves state to `localStorage` key `ck_cart`, and opens [`CartDrawer.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/components/CartDrawer.jsx).
-3. Clicking "Proceed to Checkout" opens [`CheckoutModal.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/components/CheckoutModal.jsx).
-4. Depending on selected payment method:
+### Core Flow 2: Cart, Wishlist, and Checkout
+1. A visitor clicks "Add to Bag" on a product card or in [`ProductDetailModal.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/components/ProductDetailModal.jsx).
+2. `addToCart()` in [`CartContext.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/context/CartContext.jsx) updates state, recalculates shipping thresholds, syncs `localStorage` (`ck_cart`), and slides open [`CartDrawer.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/components/CartDrawer.jsx).
+3. The customer proceeds to [`CheckoutModal.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/components/CheckoutModal.jsx):
    - **Cash on Delivery (COD)**: Payment status defaults to `PENDING`.
-   - **UPI**: Frontend requests `GET /api/payments/upi-info?amount={total}`, displaying the VPA and dynamic QR code generated via QRServer.
-   - **Razorpay**: Frontend requests `POST /api/payments/create-order`. Server uses [`paymentService.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/services/paymentService.js) to return an order ID (live or simulation).
-5. Submitting the form calls `placeOrder()` -> `POST /api/orders`.
-6. Server validates required customer fields, calls `db.createOrder()`, generates an order ID (e.g., `CK-89421`), and saves it to `inMemoryOrders`.
-7. Cart is cleared, and an order confirmation screen is displayed.
+   - **UPI**: Frontend requests `GET /api/payments/upi-info?amount={total}`, displaying the merchant VPA and dynamic QR code generated via QRServer.
+   - **Razorpay**: Frontend requests `POST /api/payments/create-order`. Server uses [`server/services/paymentService.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/services/paymentService.js) (live or simulation mode).
+4. Submitting the order sends `POST /api/orders` with customer info and line items.
+5. Server validates required fields, invokes `db.createOrder()`, generates an order ID (e.g., `CK-89421`), and stores it in memory.
+6. The customer receives an order confirmation dialog, and the cart is emptied.
 
 ### Core Flow 3: Admin CMS & Live Publishing
 1. Store administrator accesses `/admin` or presses `Ctrl+Shift+A` on the storefront.
-2. Login form sends `POST /api/auth/login` with password.
-3. Server checks against `ADMIN_PASSWORD` (default `chandrakanta2026`) and returns a 7-day signed JWT.
+2. Login credentials are submitted to `POST /api/auth/login`.
+3. The server compares against `ADMIN_PASSWORD` and signs a 7-day JWT.
 4. Token is saved in `localStorage` (`ck_admin_token`).
-5. Admin edits content in [`AdminDashboard.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/admin/AdminDashboard.jsx), triggering `PUT /api/admin/draft/:section` or `PUT /api/admin/draft`.
-6. Server updates `inMemoryDraft` (and the `draft` document in MongoDB if connected).
+5. Admin modifies content in [`AdminDashboard.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/admin/AdminDashboard.jsx), which calls `PUT /api/admin/draft/:section` or `PUT /api/admin/draft`.
+6. Changes are stored in `inMemoryDraft` (and MongoDB `Content` document with key `'draft'` if connected).
 7. Admin clicks "Publish to Storefront" -> `POST /api/admin/publish`.
-8. Server copies `inMemoryDraft` to `inMemoryLive` (and updates MongoDB `live` document), setting a new `lastPublishedAt` timestamp.
+8. The server copies `inMemoryDraft` into `inMemoryLive` (and MongoDB `'live'` document), setting a new `lastPublishedAt` timestamp.
+
+### Core Flow 4: Media Upload
+1. Admin selects an image to upload in the product or customizer editor.
+2. Form submits multipart data to `POST /api/media/upload` with Bearer auth.
+3. Multer buffers the file in memory.
+4. [`server/services/mediaService.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/services/mediaService.js) checks for Cloudinary credentials:
+   - If present, uploads directly to Cloudinary.
+   - If absent, writes file to [`client/public/uploads/`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/public/uploads/) and returns `/uploads/<filename>`.
+
+### Data Models
+- **Content** ([`server/models/Content.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/models/Content.js)): Key-value document schema (`'live'` and `'draft'`) holding the entire site tree (hero, marquee, categories, products, footer, settings).
+- **Product** ([`server/models/Product.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/models/Product.js)): Schema for catalog items (`id`, `name`, `type`, `category`, `price`, `images`, `swatches`, `stock`, `details`).
+- **Order** ([`server/models/Order.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/models/Order.js)): Schema for customer orders (`orderId`, `customer`, `items`, `pricing`, `paymentMethod`, `paymentStatus`, `orderStatus`, `transactionId`).
+- *Note:* In the current implementation of `server/db.js`, products reside inside the monolithic `Content` document, and customer orders reside in the `inMemoryOrders` array.
 
 ---
 
 ## 5. Conventions
 
-### Code Style & Patterns
-- **Styling**: All global styling and CSS custom properties are maintained in [`client/src/styles/index.css`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/styles/index.css). Design tokens include:
-  - Background: `--bg: #faf8f5;`
-  - Accent Red: `--accent: #7B1C1C;`
-  - Gold: `--gold: #C8922A;`
+### Code Style & Formatting
+- **Pure ECMAScript Modules**: `import`/`export` across both client and server; no CommonJS `require()`.
+- **CSS Design Tokens**: Defined in [`client/src/styles/index.css`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/styles/index.css):
+  - Primary Accent: `--accent: #7B1C1C;` (Royal Crimson)
+  - Secondary Accent: `--gold: #C8922A;` (Zari Gold)
+  - Background: `--bg: #faf8f5;` (Ivory Silk)
   - Surface: `--surface: #ffffff;`
   - Typography: `--font-disp: 'Playfair Display', Georgia, serif;`, `--font-body: 'Mulish', 'Helvetica Neue', sans-serif;`
-- **Component Design**: Functional components with hooks; no external UI component libraries (custom vanilla CSS classes used throughout).
-- **Authentication**: Bearer token authentication via HTTP headers (`Authorization: Bearer <token>`) protected by the `requireAuth` middleware in [`server/index.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/index.js).
-- **Error Handling**: API endpoints wrap logic in `try/catch` and return `{ success: false, error: err.message }` or `{ error: ... }`.
-- **Git & Commits**: There is currently **no Git repository initialized** in the workspace.
+- **Error Handling**: API endpoints catch errors and return consistent JSON payloads (`{ success: false, error: err.message }` or `{ error: ... }`).
+- **State Management**: React Context (`StoreContext`, `CartContext`) combined with `localStorage` for offline survivability.
+- **Git Commit Conventions**: Conventional commit format (`feat:`, `fix:`, `refactor:`, `chore:`, `deploy:`, `media:`, `design:`, `docs:`).
 
 ---
 
 ## 6. How to Run, Build, and Test
 
 ### Prerequisites
-- Node.js `v20+` (current environment: `v24.22.0`)
-- On Windows PowerShell, use `npm.cmd` instead of `npm` if script execution policies block `.ps1` files.
+- Node.js `v20+` (Environment runtime: `v24.22.0`)
+- npm `v10+` (Environment runtime: `11.19.1`, use `npm.cmd` on Windows)
 
 ### 1. Backend Server
 ```powershell
-# Navigate to server
-cd c:\Users\Felix\Desktop\chandraknta\website\server
-
-# Install dependencies (if needed)
+cd server
 npm.cmd install
-
-# Start in development mode (with Node --watch)
-npm.cmd run dev
-
-# Or start standard production server
-npm.cmd start
+npm.cmd run dev       # Starts development server with node --watch index.js
+npm.cmd start         # Starts production node index.js
 ```
-*Server runs on:* `http://localhost:5000`
+*Backend URL:* `http://localhost:5000`
 
 ### 2. Frontend Client
 ```powershell
-# Navigate to client
-cd c:\Users\Felix\Desktop\chandraknta\website\client
-
-# Install dependencies (if needed)
+cd client
 npm.cmd install
-
-# Start Vite dev server
-npm.cmd run dev
-
-# Build production bundle
-npm.cmd run build
-
-# Preview production build
-npm.cmd run preview
+npm.cmd run dev       # Starts Vite dev server on http://localhost:3000
+npm.cmd run build     # Compiles production bundle to client/dist
+npm.cmd run preview   # Previews the production build locally
 ```
-*Frontend runs on:* `http://localhost:3000`
+*Frontend URL:* `http://localhost:3000` (proxies `/api` and `/uploads` to port `5000`)
 
 ### 3. Tests and Linting
-- **Tests**: None configured. Neither `client` nor `server` has test runners (Vitest, Jest, Mocha) or test scripts in `package.json`.
-- **Linting**: No ESLint or Prettier configuration files are present in the repository.
+- **Tests**: No automated test framework (Vitest, Jest) or test scripts currently exist in either `package.json`.
+- **Linting**: No ESLint or Prettier configurations are set up.
 
-### 4. Required Environment Variables (`server/.env`)
-*Note: Variable names only; never store secrets in notes or code.*
-- `PORT` (e.g. `5000`)
-- `JWT_SECRET`
-- `ADMIN_PASSWORD`
-- `MONGODB_URI` *(Optional: runs in-memory if empty)*
-- `RAZORPAY_KEY_ID` *(Optional: runs simulated if empty)*
-- `RAZORPAY_KEY_SECRET` *(Optional: runs simulated if empty)*
-- `UPI_VPA`
-- `UPI_MERCHANT_NAME`
-- `CLOUDINARY_CLOUD_NAME` *(Optional: saves to client/public/uploads if empty)*
-- `CLOUDINARY_API_KEY` *(Optional)*
-- `CLOUDINARY_API_SECRET` *(Optional)*
+### 4. Required Environment Variables
+*Variable names only (never commit secret values):*
+- **Server (`server/.env`)**:
+  - `PORT`
+  - `NODE_ENV`
+  - `JWT_SECRET`
+  - `ADMIN_PASSWORD`
+  - `MONGODB_URI` *(Optional: runs in-memory if empty)*
+  - `RAZORPAY_KEY_ID` *(Optional: runs in simulation mode if empty)*
+  - `RAZORPAY_KEY_SECRET` *(Optional: runs in simulation mode if empty)*
+  - `UPI_VPA`
+  - `UPI_MERCHANT_NAME`
+  - `CLOUDINARY_CLOUD_NAME` *(Optional: writes to client/public/uploads if empty)*
+  - `CLOUDINARY_API_KEY` *(Optional)*
+  - `CLOUDINARY_API_SECRET` *(Optional)*
+  - `CLOUDINARY_URL` *(Optional)*
+- **Client (`client/.env`)**:
+  - `VITE_API_URL` *(Optional in dev: uses Vite proxy; required in production if frontend and backend are hosted on separate domains)*
 
 ---
 
 ## 7. Risks and Tech Debt
 
-1. **No Version Control**:
-   - The workspace directory is not a Git repository. Any file edits are irreversible without manual backups.
-2. **Database Persistence Gaps**:
-   - `server/models/Product.js` and `server/models/Order.js` exist, but [`server/db.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/db.js) stores orders strictly in an in-memory array (`inMemoryOrders`). Orders are completely lost whenever the server restarts.
-   - Products are stored inside the monolithic `live` and `draft` content JSON documents in the `Content` collection rather than using the `Product` collection.
-3. **Hardcoded Secrets in Source**:
-   - [`server/index.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/index.js) and [`server/.env`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/.env) contain default fallback credentials for `JWT_SECRET` and `ADMIN_PASSWORD`.
-4. **Monolithic Backend Routing**:
-   - The `server/routes/` folder is empty; all API routes (public content, products, categories, orders, payments, auth, admin CMS, media) are concentrated in [`server/index.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/index.js).
-5. **Monolithic Admin Component**:
-   - [`AdminDashboard.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/admin/AdminDashboard.jsx) is 1,125 lines, bundling state, modals, tabs, forms, and custom styles in a single file.
-6. **Data Duplication**:
-   - Seed data in [`server/data/defaultData.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/data/defaultData.js) and [`client/src/data/defaultStoreData.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/data/defaultStoreData.js) are separate duplicates of the same 284 lines of data. Changes made to one will not reflect in the other.
-7. **Zero Automated Test Coverage**:
-   - There are no unit, integration, or end-to-end tests for checkout calculations, auth verification, or database synchronization.
+1. **Ephemeral Order Storage**:
+   - Customer orders are stored exclusively in an in-memory array (`inMemoryOrders` in [`server/db.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/db.js)). Even if `MONGODB_URI` is provided, customer orders are not written to MongoDB and will be wiped whenever the server restarts.
+2. **Monolithic Content Document**:
+   - Catalog products and categories are stored as sub-arrays inside the single `Content` document rather than utilizing the standalone [`server/models/Product.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/models/Product.js) collection.
+3. **Data Duplication**:
+   - Seed data in [`server/data/defaultData.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/data/defaultData.js) and [`client/src/data/defaultStoreData.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/data/defaultStoreData.js) are duplicate copies of the same 284 lines. Edits to one will not automatically reflect in the other.
+4. **Monolithic Admin Component**:
+   - [`client/src/admin/AdminDashboard.jsx`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/admin/AdminDashboard.jsx) is over 1,120 lines long, bundling dashboard navigation, CMS editors, order viewer, product forms, and CSS in a single file.
+5. **Monolithic Backend Route File**:
+   - All backend REST endpoints (content, products, orders, payments, auth, admin, media) are declared in [`server/index.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/index.js), while the `server/routes/` directory remains unused.
+6. **Single Hardcoded Admin Password**:
+   - Authentication relies on comparing a plaintext password against `ADMIN_PASSWORD` in `.env` (with a hardcoded fallback string) rather than hashed user accounts in a database.
+7. **Zero Automated Tests**:
+   - No unit or end-to-end tests exist for shopping cart calculations, UPI deep link formatting, or checkout flows.
+8. **Untracked Directory (`SAMPLE/`)**:
+   - An untracked directory `SAMPLE/` (containing an Ayodhya hotel application) exists in the repository root and is not listed in `.gitignore`.
 
 ---
 
 ## 8. Open Questions
 
-1. **Version Control**: Should we initialize a Git repository in this directory (`git init`) or connect to an existing remote repository?
-2. **Order & Product Persistence**: Should customer orders and catalog products be persisted into dedicated MongoDB collections (`Order` and `Product` models), or continue living inside the in-memory array / monolithic `Content` document?
-3. **Admin Authentication**: Would you like to introduce hashed admin passwords (e.g., bcrypt) and multiple admin user roles, or keep the single shared environment password?
-4. **Production Payment Setup**: Are Razorpay API keys and a live MongoDB instance ready to be hooked up, or should we continue developing in simulation mode?
+1. **Order & Catalog Persistence**: Should we connect customer orders and catalog products directly to MongoDB collections ([`Order`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/models/Order.js) and [`Product`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/models/Product.js)) instead of keeping orders in volatile memory and products embedded in the `Content` document?
+2. **Untracked Directory (`SAMPLE/`)**: Is the `SAMPLE/` folder needed for reference, or should it be removed or added to `.gitignore`?
+3. **Admin User Management**: Would you like to keep the single environment-based admin password, or migrate to a database-backed user model with bcrypt-hashed passwords?
+4. **Automated Testing**: Should we configure Vitest for frontend context/component testing and Jest/Supertest for backend API testing?
