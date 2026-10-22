@@ -4,6 +4,10 @@ import { useStore } from '../context/StoreContext';
 
 export default function CategoryGrid({ onSelectCategory }) {
   const { content } = useStore();
+  const visible = content?.layout?.visibleSections?.categories !== false;
+  const layout = content?.layout || {};
+  const categoryStyle = layout.categoryStyle || 'cards';
+
   const categories = content?.categories || [
     {
       id: "sarees",
@@ -25,6 +29,8 @@ export default function CategoryGrid({ onSelectCategory }) {
     }
   ];
 
+  if (!visible) return null;
+
   const handleClick = (catId) => {
     if (onSelectCategory) {
       onSelectCategory(catId);
@@ -34,7 +40,7 @@ export default function CategoryGrid({ onSelectCategory }) {
   };
 
   return (
-    <section className="cats" id="categories" aria-labelledby="cat-h2">
+    <section className={`cats cats-style-${categoryStyle}`} id="categories" aria-labelledby="cat-h2" data-cms-target="categories">
       <div className="sec-hdr">
         <p className="sec-label">Our Collections</p>
         <h2 className="sec-title" id="cat-h2">Shop by Category</h2>
@@ -44,10 +50,11 @@ export default function CategoryGrid({ onSelectCategory }) {
       </div>
 
       <div className="cats-grid">
-        {categories.map((cat) => (
+        {categories.map((cat, idx) => (
           <div
-            key={cat.id}
+            key={cat.id || idx}
             className="cat-card"
+            data-cms-target={`categories.${idx}`}
             onClick={() => handleClick(cat.id)}
             role="button"
             tabIndex={0}
@@ -57,11 +64,12 @@ export default function CategoryGrid({ onSelectCategory }) {
               src={cat.image || "/images/cat-saree.jpg"}
               alt={cat.name}
               loading="lazy"
+              data-cms-target={`categories.${idx}.image`}
             />
             <div className="cat-ov">
               <div className="cat-info">
                 <p className="cat-count">{cat.count}</p>
-                <h3 className="cat-name">{cat.name}</h3>
+                <h3 className="cat-name" data-cms-target={`categories.${idx}.name`}>{cat.name}</h3>
                 <span className="cat-link">
                   Shop Now <ArrowRight size={13} strokeWidth={2.5} />
                 </span>
