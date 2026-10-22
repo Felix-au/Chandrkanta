@@ -3,6 +3,8 @@ import { useStore } from '../context/StoreContext';
 
 export default function Newsletter() {
   const { content } = useStore();
+  const visible = content?.layout?.visibleSections?.newsletter !== false;
+
   const nl = content?.newsletter || {
     label: "Stay Connected",
     title: "First to Know, First to Glow",
@@ -13,6 +15,8 @@ export default function Newsletter() {
 
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+
+  if (!visible) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -25,11 +29,11 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="nl" aria-labelledby="nl-h2">
+    <section className="nl" id="newsletter" aria-labelledby="nl-h2" data-cms-target="newsletter">
       <div className="nl-in">
-        <p className="nl-label">{nl.label || "Stay Connected"}</p>
-        <h2 className="nl-title" id="nl-h2">{nl.title || "First to Know, First to Glow"}</h2>
-        <p className="nl-desc">
+        <p className="nl-label" data-cms-target="newsletter.label">{nl.label || "Stay Connected"}</p>
+        <h2 className="nl-title" id="nl-h2" data-cms-target="newsletter.title">{nl.title || "First to Know, First to Glow"}</h2>
+        <p className="nl-desc" data-cms-target="newsletter.description">
           {nl.description || "Subscribe for exclusive access to new arrivals, festive offers and insider styling tips — straight to your inbox."}
         </p>
 
@@ -49,6 +53,7 @@ export default function Newsletter() {
             type="submit"
             className="nl-btn"
             style={subscribed ? { background: '#2d6b2d' } : {}}
+            data-cms-target="newsletter.buttonText"
           >
             {subscribed ? '✓ Subscribed!' : (nl.buttonText || 'Subscribe')}
           </button>

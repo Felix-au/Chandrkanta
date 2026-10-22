@@ -3,6 +3,8 @@ import { useStore } from '../context/StoreContext';
 
 export default function Testimonials() {
   const { content } = useStore();
+  const visible = content?.layout?.visibleSections?.testimonials !== false;
+
   const testimonials = content?.testimonials || {
     label: "Customer Love",
     title: "What Our Customers Say",
@@ -35,20 +37,22 @@ export default function Testimonials() {
     ]
   };
 
+  if (!visible) return null;
+
   return (
-    <section className="testi" aria-labelledby="testi-h2">
+    <section className="testi" id="reviews" aria-labelledby="testi-h2" data-cms-target="testimonials">
       <div className="testi-in">
         <div className="sec-hdr">
-          <p className="sec-label">{testimonials.label || "Customer Love"}</p>
-          <h2 className="sec-title" id="testi-h2">{testimonials.title || "What Our Customers Say"}</h2>
-          <p className="sec-desc">
+          <p className="sec-label" data-cms-target="testimonials.label">{testimonials.label || "Customer Love"}</p>
+          <h2 className="sec-title" id="testi-h2" data-cms-target="testimonials.title">{testimonials.title || "What Our Customers Say"}</h2>
+          <p className="sec-desc" data-cms-target="testimonials.description">
             {testimonials.description || "Thousands of happy customers across India trust Chandrakanta for their most special occasions."}
           </p>
         </div>
 
         <div className="testi-grid">
-          {(testimonials.items || []).map((item) => (
-            <article className="testi-card" key={item.id}>
+          {(testimonials.items || []).map((item, idx) => (
+            <article className="testi-card" key={item.id || idx} data-cms-target={`testimonials.${idx}`}>
               <div className="stars" aria-label="5 out of 5 stars">
                 {"★".repeat(item.rating || 5)}
               </div>
