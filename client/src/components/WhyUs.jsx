@@ -6,6 +6,8 @@ const icons = [Award, ShieldCheck, RotateCcw, Truck];
 
 export default function WhyUs() {
   const { content } = useStore();
+  const visible = content?.layout?.visibleSections?.whyUs !== false;
+
   const whyUs = content?.whyUs || {
     label: "Our Promise",
     title: "Why Chandrakanta?",
@@ -34,13 +36,15 @@ export default function WhyUs() {
     ]
   };
 
+  if (!visible) return null;
+
   return (
-    <section className="why" aria-labelledby="why-h2">
+    <section className="why" id="why-us" aria-labelledby="why-h2" data-cms-target="whyUs">
       <div className="why-in">
         <div className="sec-hdr">
-          <p className="sec-label">{whyUs.label || "Our Promise"}</p>
-          <h2 className="sec-title" id="why-h2">{whyUs.title || "Why Chandrakanta?"}</h2>
-          <p className="sec-desc">
+          <p className="sec-label" data-cms-target="whyUs.label">{whyUs.label || "Our Promise"}</p>
+          <h2 className="sec-title" id="why-h2" data-cms-target="whyUs.title">{whyUs.title || "Why Chandrakanta?"}</h2>
+          <p className="sec-desc" data-cms-target="whyUs.description">
             {whyUs.description || "We believe every woman deserves to feel like royalty. Here's our commitment to you."}
           </p>
         </div>
@@ -49,12 +53,12 @@ export default function WhyUs() {
           {(whyUs.items || []).map((item, idx) => {
             const Icon = icons[idx % icons.length];
             return (
-              <div className="why-card" key={item.id || idx}>
+              <div className="why-card" key={item.id || idx} data-cms-target={`whyUs.${idx}`}>
                 <div className="why-icon" aria-hidden="true">
                   <Icon size={24} strokeWidth={1.8} />
                 </div>
-                <h3 className="why-ttl">{item.title}</h3>
-                <p className="why-dsc">{item.description}</p>
+                <h3 className="why-ttl" data-cms-target={`whyUs.${idx}.title`}>{item.title}</h3>
+                <p className="why-dsc" data-cms-target={`whyUs.${idx}.description`}>{item.description}</p>
               </div>
             );
           })}

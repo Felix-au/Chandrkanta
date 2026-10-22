@@ -12,6 +12,7 @@ const iconMap = {
 
 export default function TrustStrip() {
   const { content } = useStore();
+  const visible = content?.layout?.visibleSections?.trustStrip !== false;
   const items = content?.trustStrip || [
     { id: 1, title: "Free Shipping above ₹1999", icon: "Truck" },
     { id: 2, title: "100% Authentic Handloom", icon: "ShieldCheck" },
@@ -20,13 +21,15 @@ export default function TrustStrip() {
     { id: 5, title: "24/7 Customer Support", icon: "Headphones" }
   ];
 
+  if (!visible) return null;
+
   return (
-    <div className="trust" aria-label="Brand promises">
+    <div className="trust" aria-label="Brand promises" data-cms-target="trustStrip">
       <div className="trust-in">
-        {items.map((it) => {
+        {items.map((it, idx) => {
           const IconComp = iconMap[it.icon] || ShieldCheck;
           return (
-            <div className="trust-item" key={it.id || it.title}>
+            <div className="trust-item" key={it.id || it.title} data-cms-target={`trustStrip.${idx}`}>
               <IconComp size={20} strokeWidth={2} />
               <span>{it.title}</span>
             </div>

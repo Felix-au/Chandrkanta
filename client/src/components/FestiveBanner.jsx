@@ -4,6 +4,8 @@ import { useStore } from '../context/StoreContext';
 
 export default function FestiveBanner({ onExplore }) {
   const { content } = useStore();
+  const visible = content?.layout?.visibleSections?.festiveBanner !== false;
+
   const festive = content?.festive || {
     label: "Festive Edit 2024",
     title: "Dress for Every Celebration",
@@ -16,6 +18,8 @@ export default function FestiveBanner({ onExplore }) {
       "/images/saree-purple.jpg"
     ]
   };
+
+  if (!visible) return null;
 
   const renderTitle = () => {
     const titleText = festive.title || "Dress for Every Celebration";
@@ -42,22 +46,23 @@ export default function FestiveBanner({ onExplore }) {
   };
 
   return (
-    <section className="festive" id="festive" aria-labelledby="fest-h2">
+    <section className="festive" id="festive" aria-labelledby="fest-h2" data-cms-target="festive">
       <div className="festive-in">
         <div className="festive-cnt">
-          <p className="fest-label">{festive.label || "Festive Edit 2024"}</p>
-          <h2 className="fest-title" id="fest-h2">
+          <p className="fest-label" data-cms-target="festive.label">{festive.label || "Festive Edit 2024"}</p>
+          <h2 className="fest-title" id="fest-h2" data-cms-target="festive.title">
             {renderTitle()}
           </h2>
-          <p className="fest-desc">
+          <p className="fest-desc" data-cms-target="festive.description">
             {festive.description || "From Diwali to Dussehra, weddings to sangeets — Chandrakanta's festive collection brings timeless tradition to every joyful occasion."}
           </p>
           <button
             onClick={handleCta}
             className="btn-pri"
             id="cta-festive"
+            data-cms-target="festive.ctaText"
           >
-            {festive.ctaText || "Explore Festive Edit"}
+            <span>{festive.ctaText || "Explore Festive Edit"}</span>
             <ArrowRight size={13} strokeWidth={2.5} />
           </button>
         </div>
@@ -67,11 +72,13 @@ export default function FestiveBanner({ onExplore }) {
             src={festive.images?.[0] || "/images/suit-navy.jpg"}
             alt="Midnight blue festive suit set"
             loading="lazy"
+            data-cms-target="festive.images.0"
           />
           <img
             src={festive.images?.[1] || "/images/saree-purple.jpg"}
             alt="Royal purple Kanjivaram silk saree"
             loading="lazy"
+            data-cms-target="festive.images.1"
           />
         </div>
       </div>
