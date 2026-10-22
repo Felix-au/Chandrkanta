@@ -1,7 +1,8 @@
 # Onboarding Notes: Chandrakanta Luxury Handlooms Website
 
-**Date of Onboarding:** October 19, 2026  
-**Workspace Root:** `c:\Users\Felix\Desktop\chandraknta\website`
+**Date of Onboarding:** October 21, 2026  
+**Workspace Root:** `c:\Users\Felix\Desktop\chandraknta\website`  
+**Git Repository:** `https://github.com/Felix-au/Chandrkanta.git` (Branch: `main`)
 
 ---
 
@@ -9,10 +10,10 @@
 
 **Chandrakanta** is a full-stack Indian ethnic e-commerce web platform specializing in handcrafted Banarasi silk sarees, Kanjivaram sarees, and unstitched suit sets.
 
-The platform consists of:
-1. **Customer-Facing Storefront (`client`)**: A React 19 single-page application built with Vite, styled with custom luxury ethnic CSS design tokens, featuring an announcement marquee, dynamic hero banner, category filters, interactive product grid, quick-view detail modal, slide-out cart and wishlist drawers, and a checkout modal supporting COD, UPI (with QR code), and Razorpay.
-2. **Backend API & CMS Engine (`server`)**: An Express REST API with dual-mode storage (in-memory default with seamless MongoDB sync), media upload handling, payment integration (Razorpay & UPI with simulated fallbacks), and a live-versus-draft content management system (CMS) that allows real-time site updates.
-3. **Admin Customizer Portal (`client/src/admin`)**: A password-protected dashboard (accessible via `/admin` or `Ctrl+Shift+A`) enabling store managers to edit site copy, manage products and categories, track orders, and publish draft updates directly to the live storefront.
+The platform is structured into two main applications:
+1. **Storefront Frontend (`client/`)**: A single-page application built with React 19 and Vite. It implements custom luxury ethnic design tokens, an animated announcement marquee, dynamic hero banner, category filters, product quick-view modal, slide-out cart & wishlist drawers, and a checkout modal supporting Cash on Delivery (COD), UPI (with dynamic QR code generation), and Razorpay payments.
+2. **Backend API & CMS Engine (`server/`)**: An Express REST API with dual-mode storage (runs fully in-memory with automatic sync to MongoDB Atlas when configured), media asset upload handling (Cloudinary with local disk fallback), payment processing, and a live-versus-draft content management system (CMS) that allows real-time site updates.
+3. **Admin Customizer Portal (`client/src/admin/`)**: A password-protected dashboard accessible via `/admin` or `Ctrl+Shift+A` that allows store managers to edit site copy, manage catalog products and collections, track orders, and publish draft updates directly to the storefront.
 
 ---
 
@@ -20,30 +21,32 @@ The platform consists of:
 
 ### Languages & Runtimes
 - **Node.js**: `v24.22.0`
-- **npm**: `11.19.1` (requires `npm.cmd` on Windows due to PowerShell script execution policies)
+- **npm**: `11.19.1` (use `npm.cmd` on Windows PowerShell to respect script execution policies)
 - **Module System**: ECMAScript Modules (`"type": "module"` in both client and server)
 
 ### Frontend (`client/package.json`)
 - **Core**: React `^19.2.8`, `react-dom` `^19.2.8`
-- **Bundler / Dev Server**: Vite `^8.3.0` with `@vitejs/plugin-react` `^6.1.1`
-- **Icons**: Lucide React `^1.49.0`
-- **Styling**: Vanilla CSS design tokens (`client/src/styles/index.css`) + embedded component CSS
-- **Typography**: Google Fonts (*Playfair Display* for serif headings, *Mulish* for body text)
-- **Port**: `3000` (proxies `/api` and `/uploads` to `http://localhost:5000`)
+- **Bundler & Dev Server**: Vite `^8.3.0` with `@vitejs/plugin-react` `^6.1.1`
+- **Icons**: Lucide React `^0.475.0`
+- **Styling**: Vanilla CSS design tokens ([`client/src/styles/index.css`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/src/styles/index.css)) and component-scoped `<style>` tags
+- **Typography**: Google Fonts (*Playfair Display* for serif headings, *Mulish* for body copy)
+- **Development Port**: `3000` (proxies `/api` and `/uploads` to `http://localhost:5000`)
 
 ### Backend (`server/package.json`)
-- **Server Framework**: Express `^4.19.2`
+- **Web Framework**: Express `^4.19.2`
 - **Database ODM**: Mongoose `^8.3.2`
-- **Security & Auth**: `jsonwebtoken` `^9.0.2` (admin JWT auth), Node native `crypto` (HMAC SHA-256 for Razorpay signature verification)
-- **Middleware**: `cors` `^2.8.5`, `dotenv` `^16.4.5`, `multer` `^1.4.5-lts.1` (in-memory buffer handling for file uploads)
-- **Port**: `5000` (configurable via `process.env.PORT`)
+- **Authentication**: `jsonwebtoken` `^9.0.2` (admin JWT auth)
+- **Security & Hashes**: Node native `crypto` module (HMAC SHA-256 for Razorpay signature verification)
+- **Middleware**: `cors` `^2.8.5`, `dotenv` `^16.4.5`, `multer` `^1.4.5-lts.1` (memory buffer storage)
+- **Media Hosting**: `cloudinary` `^2.11.0` (with fallback to local filesystem)
+- **Development Port**: `5000` (configurable via `process.env.PORT`)
 
 ### External Services & Integrations
-- **MongoDB**: Optional database layer; automatically falls back to in-memory store if `MONGODB_URI` is unset or connection fails.
-- **Razorpay**: Payment gateway integration in [`paymentService.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/services/paymentService.js); automatically falls back to simulated order creation if credentials are missing.
-- **UPI Deep Linking & QR Codes**: Generates standard `upi://pay` URI parameters and dynamic QR codes via `https://api.qrserver.com/v1/create-qr-code`.
-- **Cloudinary**: Optional cloud image hosting in [`mediaService.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/services/mediaService.js); falls back to saving files directly to local disk in `client/public/uploads`.
-- **Design System Asset Reference**: `skillui-extract/chandrakanta-design/` contains extracted tokens and component guidelines (`SKILL.md`, `DESIGN.md`).
+- **MongoDB Atlas**: Database layer in [`server/db.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/db.js); automatically operates in-memory if `MONGODB_URI` is unset or unreachable.
+- **Razorpay**: Payment gateway integration in [`server/services/paymentService.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/services/paymentService.js); provides simulated checkout if credentials are unset.
+- **UPI Deep Linking & QR Codes**: Standard `upi://pay` intent generator with dynamic QR codes via `https://api.qrserver.com/v1/create-qr-code`.
+- **Cloudinary**: Cloud image storage in [`server/services/mediaService.js`](file:///c:/Users/Felix/Desktop/chandraknta/website/server/services/mediaService.js); falls back to local disk writes in [`client/public/uploads/`](file:///c:/Users/Felix/Desktop/chandraknta/website/client/public/uploads).
+- **Design System Asset Reference**: [`skillui-extract/chandrakanta-design/`](file:///c:/Users/Felix/Desktop/chandraknta/website/skillui-extract/chandrakanta-design) contains extracted tokens, fonts, and component guidelines.
 
 ---
 
@@ -51,13 +54,21 @@ The platform consists of:
 
 ```
 website/
-├── ONBOARDING_NOTES.md         # This documentation file
-├── client/                     # Frontend Vite + React SPA
-│   ├── dist/                   # Production build artifact directory
-│   ├── index.html              # HTML shell loading Google Fonts and mounting src/main.jsx
-│   ├── package.json            # Client package definition & scripts
+├── .gitignore                  # Git ignore rules for node_modules, .env, uploads, build output
+├── ONBOARDING_NOTES.md         # Onboarding documentation and architectural guide
+├── README.md                   # High-level overview and setup instructions
+├── render.yaml                 # Render Blueprint for server deployment
+├── vercel.json                 # Vercel configuration for client deployment & routing
+├── client/                     # Frontend React 19 + Vite application
+│   ├── .env.example            # Client environment variable template (VITE_API_URL)
+│   ├── index.html              # HTML shell mounting Google Fonts and src/main.jsx
+│   ├── package.json            # Client package dependencies and npm scripts
 │   ├── vite.config.js          # Vite config with reverse proxy to http://localhost:5000
 │   ├── public/                 # Static assets served by Vite
+│   │   ├── images/             # 25 static product and collection image files
+│   │   └── uploads/            # Target folder for local disk fallback image uploads
+│   └── src/
+
 │   │   ├── images/             # 25 static product and collection image files
 │   │   └── uploads/            # Target folder for locally uploaded CMS media
 │   └── src/
