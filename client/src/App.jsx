@@ -23,6 +23,8 @@ function StorefrontContent({ onOpenAdmin }) {
   const { content } = useStore();
   const { itemCount, setIsCartOpen } = useCart();
   const settings = content?.settings || {};
+  const layout = content?.layout || {};
+  const visibleSections = layout.visibleSections || {};
 
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -30,6 +32,50 @@ function StorefrontContent({ onOpenAdmin }) {
   const handleFilterCategory = (catId, query = '') => {
     setActiveCategory(catId);
     setSearchQuery(query);
+  };
+
+  const defaultOrder = [
+    'hero',
+    'trustStrip',
+    'categories',
+    'featuredProducts',
+    'festiveBanner',
+    'whyUs',
+    'testimonials',
+    'newsletter'
+  ];
+  const sectionOrder = layout.sectionOrder || defaultOrder;
+
+  const renderSection = (key) => {
+    switch (key) {
+      case 'hero':
+        return <Hero key="hero" onFilterCategory={handleFilterCategory} />;
+      case 'trustStrip':
+        return <TrustStrip key="trustStrip" />;
+      case 'categories':
+        return <CategoryGrid key="categories" onSelectCategory={handleFilterCategory} />;
+      case 'featuredProducts':
+      case 'products':
+        return (
+          <ProductGrid
+            key="products"
+            activeCategory={activeCategory}
+            searchQuery={searchQuery}
+            onSelectCategory={handleFilterCategory}
+          />
+        );
+      case 'festiveBanner':
+      case 'festive':
+        return <FestiveBanner key="festive" onExplore={handleFilterCategory} />;
+      case 'whyUs':
+        return <WhyUs key="whyUs" />;
+      case 'testimonials':
+        return <Testimonials key="testimonials" />;
+      case 'newsletter':
+        return <Newsletter key="newsletter" />;
+      default:
+        return null;
+    }
   };
 
   return (
@@ -44,33 +90,8 @@ function StorefrontContent({ onOpenAdmin }) {
       />
 
       <main>
-        {/* Hero Banner */}
-        <Hero onFilterCategory={handleFilterCategory} />
-
-        {/* Value Promises Strip */}
-        <TrustStrip />
-
-        {/* Collections Category Grid */}
-        <CategoryGrid onSelectCategory={handleFilterCategory} />
-
-        {/* Featured Products & Tabs */}
-        <ProductGrid
-          activeCategory={activeCategory}
-          searchQuery={searchQuery}
-          onSelectCategory={handleFilterCategory}
-        />
-
-        {/* Festive Editorial Spotlight */}
-        <FestiveBanner onExplore={handleFilterCategory} />
-
-        {/* Artisan Promise & Why Us */}
-        <WhyUs />
-
-        {/* Customer Reviews & Testimonials */}
-        <Testimonials />
-
-        {/* Newsletter Signup */}
-        <Newsletter />
+        {/* Render Sections in Dynamic Ordered Flow */}
+        {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
       </main>
 
       {/* Footer */}
@@ -86,36 +107,38 @@ function StorefrontContent({ onOpenAdmin }) {
       <CheckoutModal />
 
       {/* Mobile Floating Action Bar */}
-      <div className="mobile-floating-bar">
-        <a
-          href={`tel:${settings.phonePrimary || '+919876543210'}`}
-          className="mobile-bar-btn call"
-          aria-label="Call Store"
-        >
-          <Phone size={16} />
-          <span>Call Now</span>
-        </a>
+      {visibleSections.floatingMobileBar !== false && (
+        <div className="mobile-floating-bar">
+          <a
+            href={`tel:${settings.phonePrimary || '+919876543210'}`}
+            className="mobile-bar-btn call"
+            aria-label="Call Store"
+          >
+            <Phone size={16} />
+            <span>Call Now</span>
+          </a>
 
-        <a
-          href={`https://wa.me/${settings.whatsappNumber || '919876543210'}?text=Namaste!%20I%20would%20like%20to%20inquire%20about%20Chandrakanta%20ethnic%20wear.`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mobile-bar-btn wa"
-          aria-label="WhatsApp Inquiry"
-        >
-          <MessageCircle size={16} />
-          <span>WhatsApp</span>
-        </a>
+          <a
+            href={`https://wa.me/${settings.whatsappNumber || '919876543210'}?text=Namaste!%20I%20would%20like%20to%20inquire%20about%20Chandrakanta%20ethnic%20wear.`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mobile-bar-btn wa"
+            aria-label="WhatsApp Inquiry"
+          >
+            <MessageCircle size={16} />
+            <span>WhatsApp</span>
+          </a>
 
-        <button
-          onClick={() => setIsCartOpen(true)}
-          className="mobile-bar-btn bag"
-          aria-label="View Shopping Bag"
-        >
-          <ShoppingBag size={16} />
-          <span>Bag ({itemCount})</span>
-        </button>
-      </div>
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="mobile-bar-btn bag"
+            aria-label="View Shopping Bag"
+          >
+            <ShoppingBag size={16} />
+            <span>Bag ({itemCount})</span>
+          </button>
+        </div>
+      )}
 
       <style>{`
         .chandrakanta-storefront {
@@ -139,7 +162,7 @@ function StorefrontContent({ onOpenAdmin }) {
           background: rgba(250, 248, 245, 0.96);
           backdrop-filter: blur(16px);
           border: 1.5px solid rgba(200, 146, 42, 0.35);
-          border-radius: var(--radius-full, 999px);
+          border-radius: var(--r-full, 999px);
           padding: 6px;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
           gap: 6px;
@@ -152,7 +175,7 @@ function StorefrontContent({ onOpenAdmin }) {
           justify-content: center;
           gap: 6px;
           padding: 10px 8px;
-          border-radius: var(--radius-full, 999px);
+          border-radius: var(--r-full, 999px);
           font-size: 11px;
           font-weight: 700;
           text-decoration: none;
@@ -193,8 +216,15 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
 
   useEffect(() => {
+    // Prevent opening admin inside the preview iframe to avoid recursion
+    if (window.self !== window.top) {
+      setIsAdminOpen(false);
+      return;
+    }
+
     // Check URL for /admin, ?admin=true, or #admin
     const checkAdminRoute = () => {
+      if (window.self !== window.top) return;
       const path = window.location.pathname.toLowerCase();
       const params = new URLSearchParams(window.location.search);
       if (
@@ -214,6 +244,7 @@ export default function App() {
 
     // Keyboard shortcut: Ctrl + Shift + A
     const handleKeyDown = (e) => {
+      if (window.self !== window.top) return;
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
         setIsAdminOpen((prev) => !prev);
